@@ -3,7 +3,7 @@ Use AMDClean as a gulp task.
 
 ## Install
 ```sh
-npm install git+https://git@github.com/MatthijsMud/grunt-amdclean.git --save-dev
+npm install git+https://git@github.com/MatthijsMud/gulp-amdclean.git --save-dev
 ```
 
 ## Usage
