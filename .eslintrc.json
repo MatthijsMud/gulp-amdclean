@@ -1,0 +1,18 @@
+{
+	"root": true,
+	"extends": [
+		"eslint:recommended"
+	],
+	
+	"globals": {
+		
+	},
+	
+	"env": {
+		"node": true
+	},
+	
+	"rules": {
+		
+	}
+}
