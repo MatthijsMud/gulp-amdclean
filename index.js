@@ -1,5 +1,7 @@
 var amdclean = require("amdclean");
 var applySourceMap = require("vinyl-sourcemaps-apply");
+var chalk = require("chalk");
+var log = require("fancy-log");
 var merge = require("deepmerge");
 var through = require("through2");
 
@@ -31,7 +33,8 @@ module.exports = function(options)
 	}
 	
 	return through.obj(function(file, encoding, next)
-	{		
+	{
+		
 		// Nothing to be done for a non-existant file.
 		if (file.isNull())
 		{
@@ -45,6 +48,8 @@ module.exports = function(options)
 		{
 			return next(new Error("Streams are not supported.", PLUGIN_NAME));
 		}
+		
+		log(PLUGIN_NAME, chalk.magenta(file.path));
 		
 		// Mix any default options with the ones provided by the user of the plugin.
 		// Copy the options to make it less likely for side effects to occur.
@@ -61,15 +66,14 @@ module.exports = function(options)
 		if (file.sourceMap)
 		{
 			// TODO: Warn users about options that are about to be changed.
+			if (options.wrap){ log.warn(chalk.yellow(PLUGIN_NAME), "Option \"wrap\" should be used when generating source maps."); }
+			
 			
 			// Provide the sourcemap that has already been generated.
 			options.sourceMap = file.sourceMap;
 			// AMDClean's documentation indicates that wrap should be disabled when
 			// generating source maps.
 			options.wrap = false;
-			options.esprima = merge(options.esprima, {
-				source: file.path
-			});
 			// Escodegen (used by amdclean), does not generate sourcemaps, unless
 			// certain options are set.
 			options.escodegen = merge(options.escodegen, {
@@ -102,6 +106,7 @@ module.exports = function(options)
 				// In the context of "gulp-sourcemaps", it is assumed that a source map
 				// is output as well.
 				var map = JSON.parse(result.map.toString());
+				map.file = file.path;
 				applySourceMap(file, map);
 			} 
 			else 
@@ -111,6 +116,7 @@ module.exports = function(options)
 		}
 		catch (error)
 		{
+			log.error(PLUGIN_NAME, error, options.esprima);
 			// Continuing with wrong output isn't too good an idea.
 			return next(error);
 		}
